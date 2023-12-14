@@ -16,11 +16,12 @@ function mycelium.makeCurlRequest(prompt, callback)
         command = 'curl',
         args = {'-X', 'POST', 'http://localhost:11434/api/generate', '-d', data},
         on_exit = function(j)
-            local result = json.decode(j:result())
+            local result_str = j:result()
+            local result = json.decode(result_str)
             if result and result.response then
                 callback(result.response)
             else
-                callback(j:result()) -- Return the entire text if 'response' field does not exist
+                callback(result_str) -- Return the entire text if 'response' field does not exist
             end
         end
     }):start()
