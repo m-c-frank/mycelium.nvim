@@ -17,6 +17,23 @@ have all the information at your fingertips
 - [ ] use every interaction as training example
 - [ ] schedule async training of model and updating weights for ollama
 
+## installation
+
+using kickstart.nvim:
+
+just put this .config/nvim/lua/custom/plugins/mycelium.lua
+
+```lua
+return {
+  'm-c-frank/mycelium.nvim',
+  config = function()
+    require("mycelium")
+  end,
+}
+```
+
+run `:Lazy` check and make sure mycelium is listed somewhere
+
 ## goal
 
 just write down what you think
