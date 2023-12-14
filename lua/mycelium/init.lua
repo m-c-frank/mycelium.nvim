@@ -16,23 +16,40 @@ function mycelium.makeCurlRequest(prompt, callback)
         command = 'curl',
         args = {'-X', 'POST', 'http://localhost:11434/api/generate', '-d', data},
         on_exit = function(j)
-            callback(j:result())
+            local result = json.decode(j:result())
+            if result and result.response then
+                callback(result.response)
+            else
+                callback(j:result()) -- Return the entire text if 'response' field does not exist
+            end
         end
     }):start()
 end
 
--- Function to display the response in the buffer
-function mycelium.displayInBuffer(response)
-    vim.schedule(function()
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        vim.api.nvim_buf_set_lines(0, line, line, false, response)
-    end)
+-- Namespace ID for extmarks
+local ns_id = vim.api.nvim_create_namespace('mycelium_namespace')
+
+-- Function to create or update an extmark with virtual text
+function mycelium.createOrUpdateExtMark(buffer, line, text, highlight_group, virt_text_pos)
+    local virt_text = {{text, highlight_group}}
+    local opts = { virt_text = virt_text, virt_text_pos = virt_text_pos or "eol" }
+    vim.api.nvim_buf_set_extmark(buffer, ns_id, line, 0, opts)
+end
+
+-- Function to display the response as virtual text
+function mycelium.displayResponse(response)
+    if response then
+        vim.schedule(function()
+            local line = vim.api.nvim_win_get_cursor(0)[1] - 1 -- Current line (0-based index)
+            mycelium.createOrUpdateExtMark(0, line, response, 'Comment', 'eol')
+        end)
+    end
 end
 
 -- Main function to generate text
 function mycelium.generateText()
     local prompt = mycelium.getPrompt()
-    mycelium.makeCurlRequest(prompt, mycelium.displayInBuffer)
+    mycelium.makeCurlRequest(prompt, mycelium.displayResponse)
 end
 
 -- Command to trigger the text generation
