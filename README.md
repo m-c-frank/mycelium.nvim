@@ -8,6 +8,15 @@ ultra minimal and using ollama
 
 have all the information at your fingertips
 
+## roadmap
+
+- [x] curl to local ollama
+- [x] display response as virtual text
+- [ ] accepting response functionality
+- [ ] storing the user interactions for training data
+- [ ] use every interaction as training example
+- [ ] schedule async training of model and updating weights for ollama
+
 ## goal
 
 just write down what you think
