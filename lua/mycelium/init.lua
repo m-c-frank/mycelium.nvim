@@ -2,7 +2,6 @@ local mycelium = {}
 
 local Job = require('plenary.job')
 local json = vim.json
-local cmp = require('cmp')
 
 -- Function to get the current prompt from the editor
 function mycelium.getPrompt()
@@ -22,30 +21,18 @@ function mycelium.makeCurlRequest(prompt, callback)
     }):start()
 end
 
--- Completion source for nvim-cmp
-local source = {}
-
-source.new = function()
-  return setmetatable({}, { __index = source })
+-- Function to display the response in the buffer
+function mycelium.displayInBuffer(response)
+    vim.schedule(function()
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        vim.api.nvim_buf_set_lines(0, line, line, false, response)
+    end)
 end
-
-source.complete = function(self, request, callback)
-  local prompt = mycelium.getPrompt()
-  mycelium.makeCurlRequest(prompt, function(result)
-    local items = vim.tbl_map(function(item)
-      return { label = item }
-    end, result)
-    callback({ items = items, isIncomplete = true })
-  end)
-end
-
--- Register the completion source
-cmp.register_source('mycelium', source.new())
 
 -- Main function to generate text
 function mycelium.generateText()
     local prompt = mycelium.getPrompt()
-    mycelium.makeCurlRequest(prompt, function(result) end)
+    mycelium.makeCurlRequest(prompt, mycelium.displayInBuffer)
 end
 
 -- Command to trigger the text generation
