@@ -16,7 +16,8 @@ function mycelium.makeCurlRequest(prompt, callback)
         command = 'curl',
         args = {'-X', 'POST', 'http://localhost:11434/api/generate', '-d', data},
         on_exit = function(j)
-            local result_str = j:result()
+            local result_table = j:result()
+            local result_str = table.concat(result_table, "\n") -- Concatenate table into string
             local result = json.decode(result_str)
             if result and result.response then
                 callback(result.response)
