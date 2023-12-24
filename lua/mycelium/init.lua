@@ -3,7 +3,7 @@ local mycelium = {}
 local Job = require('plenary.job')
 local json = vim.json
 
-local config = {
+mycelium.config = {
     max_prompt_length = 512,
     generate_url = 'http://localhost:11434/api/generate',
     model = "mistral",
@@ -13,7 +13,7 @@ local config = {
 
 function mycelium.getBufferContext()
     local full_prompt = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
-    return string.sub(full_prompt, 1, config.max_prompt_length)
+    return string.sub(full_prompt, 1, mycelium.config.max_prompt_length)
 end
 
 function mycelium.makeCurlRequest(url, requestData, callback)
@@ -62,6 +62,7 @@ end
 
 function mycelium.generateText()
     local prompt = mycelium.getBufferContext()
+    local config = mycelium.config
     mycelium.clearResponse()
     mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
 end
