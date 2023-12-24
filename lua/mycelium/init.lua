@@ -63,6 +63,7 @@ end
 
 function mycelium.generateText()
     local prompt = mycelium.getPrompt()
+    mycelium.clearResponse()
     mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
 end
 
@@ -73,10 +74,16 @@ function mycelium.stopOllamaGeneration()
     }):start()
 end
 
+function mycelium.clearResponse()
+    local buffer = 0 -- Current buffer
+    vim.api.nvim_buf_clear_namespace(buffer, ns_id, 0, -1)
+end
+
 vim.api.nvim_create_autocmd('InsertCharPre', {
     callback = mycelium.spaceTrigger
 })
 
+vim.api.nvim_create_user_command('ClearGen', mycelium.clearResponse, {})
 vim.api.nvim_create_user_command('Gen', mycelium.generateText, {})
 vim.api.nvim_create_user_command('StopGen', mycelium.stopOllamaGeneration, {})
 
