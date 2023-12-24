@@ -9,6 +9,7 @@ local config = {
     stop_url = 'http://localhost:11434/api/stop',
     model = "mistral",
     stream = true,
+    max_tokens = 8,
 }
 
 function mycelium.getPrompt()
@@ -62,7 +63,7 @@ end
 
 function mycelium.generateText()
     local prompt = mycelium.getPrompt()
-    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream }, mycelium.displayResponse)
+    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
 end
 
 function mycelium.stopOllamaGeneration()
