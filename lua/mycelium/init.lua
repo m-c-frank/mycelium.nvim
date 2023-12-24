@@ -6,13 +6,12 @@ local json = vim.json
 local config = {
     max_prompt_length = 512,
     generate_url = 'http://localhost:11434/api/generate',
-    stop_url = 'http://localhost:11434/api/stop',
     model = "mistral",
     stream = true,
     max_tokens = 8,
 }
 
-function mycelium.getPrompt()
+function mycelium.getBufferContext()
     local full_prompt = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
     return string.sub(full_prompt, 1, config.max_prompt_length)
 end
@@ -62,16 +61,9 @@ function mycelium.spaceTrigger()
 end
 
 function mycelium.generateText()
-    local prompt = mycelium.getPrompt()
+    local prompt = mycelium.getBufferContext()
     mycelium.clearResponse()
     mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
-end
-
-function mycelium.stopOllamaGeneration()
-    Job:new({
-        command = 'curl',
-        args = {'-X', 'POST', config.stop_url}
-    }):start()
 end
 
 function mycelium.clearResponse()
@@ -83,9 +75,8 @@ vim.api.nvim_create_autocmd('InsertCharPre', {
     callback = mycelium.spaceTrigger
 })
 
-vim.api.nvim_create_user_command('ClearGen', mycelium.clearResponse, {})
-vim.api.nvim_create_user_command('Gen', mycelium.generateText, {})
-vim.api.nvim_create_user_command('StopGen', mycelium.stopOllamaGeneration, {})
+vim.api.nvim_create_user_command('MClear', mycelium.clearResponse, {})
+vim.api.nvim_create_user_command('MGen', mycelium.generateText, {})
 
 return mycelium
 
