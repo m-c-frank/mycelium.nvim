@@ -1,5 +1,7 @@
 # mycelium.nvim
 
+part of the mycelium and hyphalnet vision
+
 this lets you tap into your private mesh
 
 similar to github copilot
@@ -8,10 +10,21 @@ ultra minimal and using ollama
 
 have all the information at your fingertips
 
+## current state
+
+as of now it uses hints similar to copilot
+
+but i want to make it feel more powerful
+
+it should learn from you
+
+and it must stay completely local and secure
+
 ## roadmap
 
 - [x] curl to local ollama
 - [x] display response as virtual text
+- [x] configure ollama location
 - [ ] accepting response functionality
 - [ ] storing the user interactions for training data
 - [ ] use every interaction as training example
@@ -27,7 +40,8 @@ just put this .config/nvim/lua/custom/plugins/mycelium.lua
 return {
   'm-c-frank/mycelium.nvim',
   config = function()
-    require("mycelium")
+    local mycelium = require("mycelium")
+    mycelium.config.generate_url="http://192.168.2.177:11434/api/generate"
   end,
 }
 ```
