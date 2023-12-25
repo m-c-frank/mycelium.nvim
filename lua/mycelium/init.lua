@@ -67,11 +67,50 @@ function mycelium.spaceTrigger()
     end
 end
 
+function mycelium.generatePrompt(bufferContext)
+    local prompt = string.format([[
+you complete sentences.
+
+you try to follow the users' thoughts.
+
+you always try to predict exactly 8 tokens.
+
+nothing more.
+
+but to compensate for the short prediction tokens,
+
+you have to be extremely precise.
+
+you are a large language model and I am just a bunch of cells.
+
+so let's try to get something started.
+
+it's the start of something huge.
+
+so here is the text you should predict with only 8 tokens:
+
+<SPORE>
+%s
+</SPORE>
+
+so keep in mind that you have to directly respond with that.
+
+don't waste any tokens in attempting a chain of thought
+
+or tree of thought methods. do them silently
+
+and just respond with the correct prediction:
+
+]], bufferContext)
+    return prompt
+end
+
 function mycelium.generateText()
     local bufferContext = mycelium.getBufferContext()
+    local prompt = mycelium.generatePrompt(bufferContext)
     local config = mycelium.config
     mycelium.clearResponse()
-    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = bufferContext, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
+    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
 end
 
 function mycelium.clearResponse()
