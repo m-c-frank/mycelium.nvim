@@ -12,8 +12,15 @@ mycelium.config = {
 }
 
 function mycelium.getBufferContext()
-    local full_prompt = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), "\n")
-    return string.sub(full_prompt, 1, mycelium.config.max_prompt_length)
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+    local line, col = cursor_pos[1], cursor_pos[2]
+    local lines = vim.api.nvim_buf_get_lines(0, 0, line, false)
+
+    local full_text = table.concat(lines, "\n")
+    full_text = full_text .. string.sub(lines[#lines], 1, col)
+    local start_pos = math.max(1, string.len(full_text) - 512 + 1)
+
+    return string.sub(full_text, start_pos)
 end
 
 function mycelium.makeCurlRequest(url, requestData, callback)
