@@ -5,7 +5,7 @@ local json = vim.json
 
 mycelium.config = {
     max_prompt_length = 512,
-    generate_url = 'http://localhost:11434/api/generate',
+    generate_url = 'http://localhost:11434/api/chat',
     model = "mistral",
     stream = true,
     max_tokens = 8,
@@ -24,39 +24,38 @@ function mycelium.getBufferContext()
 end
 
 function mycelium.makeCurlRequest(url, requestData, callback)
-    print("Making Curl Request") -- Debug print
-    Job:new({
+    local jsonData = vim.fn.json_encode(requestData)
+
+    local curlJob = Job:new({
         command = 'curl',
-        args = {'-X', 'POST', url, '-d', json.encode(requestData)},
-        on_stdout = function(_, response)
-            print("Response received: " .. response) -- Debug print
-            if response then
-                local json_response = json.decode(response)
-                if json_response and json_response.response then
-                    callback(json_response.response)
-                end
+        args = { url, '-d', jsonData, '-H', 'Content-Type: application/json' },
+        on_exit = function(j)
+            local response = vim.fn.json_decode(table.concat(j:result(), ""))
+            if callback then
+                callback(response)
             end
-        end,
-        stdout_buffered = false,
-        stderr_buffered = false,
-    }):start()
+        end
+    })
+
+    -- Start the job
+    curlJob:start()
 end
 
 local ns_id = vim.api.nvim_create_namespace('mycelium_namespace')
+
+function mycelium.displayResponse(response)
+    local message = response.message or "No response"
+    vim.schedule(function()
+        local buffer = vim.api.nvim_get_current_buf()
+        local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+        mycelium.createOrUpdateExtMark(buffer, line, message)
+    end)
+end
 
 function mycelium.createOrUpdateExtMark(buffer, line, text)
     local virt_text = {{text, 'Comment'}}
     local opts = { virt_text = virt_text, virt_text_pos = "eol" }
     vim.api.nvim_buf_set_extmark(buffer, ns_id, line, 0, opts)
-end
-
-function mycelium.displayResponse(response)
-    if response then
-        vim.schedule(function()
-            local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-            mycelium.createOrUpdateExtMark(0, line, response)
-        end)
-    end
 end
 
 function mycelium.spaceTrigger()
@@ -110,7 +109,17 @@ function mycelium.generateText()
     local prompt = mycelium.generatePrompt(bufferContext)
     local config = mycelium.config
     mycelium.clearResponse()
-    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
+    mycelium.makeCurlRequest(config.generate_url, {
+        model = config.model,
+        messages = {
+            {
+                role = "user",
+                content = prompt
+            }
+        },
+        stream = config.stream,
+        options = { num_predict = config.max_tokens }
+    }, mycelium.displayResponse)
 end
 
 function mycelium.clearResponse()
