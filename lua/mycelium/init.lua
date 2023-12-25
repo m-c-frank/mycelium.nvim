@@ -68,10 +68,10 @@ function mycelium.spaceTrigger()
 end
 
 function mycelium.generateText()
-    local prompt = mycelium.getBufferContext()
+    local bufferContext = mycelium.getBufferContext()
     local config = mycelium.config
     mycelium.clearResponse()
-    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = prompt, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
+    mycelium.makeCurlRequest(config.generate_url, { model = config.model, prompt = bufferContext, stream = config.stream, options = { num_predict = config.max_tokens } }, mycelium.displayResponse)
 end
 
 function mycelium.clearResponse()
