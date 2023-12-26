@@ -7,7 +7,7 @@ mycelium.config = {
     max_prompt_length = 512,
     generate_url = 'http://localhost:11434/api/chat',
     model = "mistral",
-    stream = true,
+    stream = false,
     max_tokens = 8,
 }
 
