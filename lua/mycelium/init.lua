@@ -45,10 +45,8 @@ end
 local ns_id = vim.api.nvim_create_namespace('mycelium_namespace')
 
 function mycelium.displayResponse(rawResponse)
-    print("rawResponse")
-    print(rawResponse)
     local response = json.decode(rawResponse)
-    print("response")
+    print("json response")
     print(response)
     local message = response.message.content or "No response"
     vim.schedule(function()
