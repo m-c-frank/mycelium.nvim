@@ -20,13 +20,13 @@ function mycelium.getBufferContext()
 end
 
 function mycelium.makeCurlRequest(url, requestData, callback)
-    local jsonData = vim.fn.json_encode(requestData)
+    local jsonData = json.decode(requestData)
 
     local curlJob = Job:new({
         command = 'curl',
         args = { url, '-d', jsonData, '-H', 'Content-Type: application/json' },
         on_exit = function(j)
-            local response = vim.fn.json_decode(table.concat(j:result(), ""))
+            local response = json.decode(table.concat(j:result(), ""))
             if callback then
                 callback(response)
             end
