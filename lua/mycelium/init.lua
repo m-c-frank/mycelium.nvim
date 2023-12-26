@@ -44,10 +44,12 @@ end
 local ns_id = vim.api.nvim_create_namespace('mycelium_namespace')
 
 function mycelium.displayResponse(rawResponse)
+    print("rawResponse")
     print(rawResponse)
     local response = json.decode(rawResponse)
+    print("response")
     print(response)
-    local message = response.message or "No response"
+    local message = response.message.content or "No response"
     vim.schedule(function()
         local buffer = vim.api.nvim_get_current_buf()
         local line = vim.api.nvim_win_get_cursor(0)[1] - 1
