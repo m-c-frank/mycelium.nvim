@@ -20,8 +20,9 @@ function mycelium.getBufferContext()
 end
 
 function mycelium.makeCurlRequest(url, requestData, callback)
+    print("requestData")
+    print(requestData)
     local jsonData = json.encode(requestData)
-
     local curlJob = Job:new({
         command = 'curl',
         args = { url, '-d', jsonData, '-H', 'Content-Type: application/json' },
