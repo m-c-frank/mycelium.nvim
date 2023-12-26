@@ -92,19 +92,25 @@ it's the start of something huge.
 
 so here is the text you should predict with only 8 tokens:
 
-<SPORE>
+---
 %s
-</SPORE>
+---
 
-so keep in mind that you have to directly respond with that.
+
+so keep in mind that you have to directly respond with the continuation
 
 don't waste any tokens in attempting a chain of thought
 
 or tree of thought methods. do them silently
 
-and just respond with the correct prediction:
+and just respond with the correct prediction
 
-]], bufferContext)
+and remember its just plain text you have to respond with
+
+so now continue this string without any fuss:
+
+%s
+]], bufferContext, bufferContext)
     return prompt
 end
 
