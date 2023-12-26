@@ -26,7 +26,9 @@ function mycelium.makeCurlRequest(url, requestData, callback)
         command = 'curl',
         args = { url, '-d', jsonData, '-H', 'Content-Type: application/json' },
         on_exit = function(j)
-            local response = json.decode(table.concat(j:result(), ""))
+            local result = j.result()
+            print(result)
+            local response = json.decode(table.concat(result, ""))
             if callback then
                 callback(response)
             end
