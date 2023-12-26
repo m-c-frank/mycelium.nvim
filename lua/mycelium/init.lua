@@ -31,9 +31,8 @@ function mycelium.makeCurlRequest(url, requestData, callback)
                 print("Empty or invalid response received")
                 return
             end
-            local response = json.decode(rawResponse)
             if callback then
-                callback(response)
+                callback(rawResponse)
             end
         end
     })
@@ -44,7 +43,10 @@ end
 
 local ns_id = vim.api.nvim_create_namespace('mycelium_namespace')
 
-function mycelium.displayResponse(response)
+function mycelium.displayResponse(rawResponse)
+    print(rawResponse)
+    local response = json.decode(rawResponse)
+    print(response)
     local message = response.message or "No response"
     vim.schedule(function()
         local buffer = vim.api.nvim_get_current_buf()
